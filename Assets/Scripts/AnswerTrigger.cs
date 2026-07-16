@@ -6,6 +6,7 @@ public class AnswerTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"Trigger hit by {other.name}, tag={other.tag}");
         if (other.CompareTag("Player"))
         {
             GameManager.Instance.PlayerAnswered(thisAnswerIsAnomaly);
