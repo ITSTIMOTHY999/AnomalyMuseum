@@ -7,8 +7,8 @@ public class MouseLook : MonoBehaviour
     public Transform playerBody;
 
     [Header("Sway")]
-    public float swayAmount = 3f;
-    public float swaySmoothing = 6f;
+    public float swayAmount = 1f;
+    public float swaySmoothing = 2f;
 
     [Header("Bob")]
     public float bobSpeed = 8f;
