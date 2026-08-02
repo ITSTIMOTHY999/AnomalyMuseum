@@ -30,7 +30,7 @@ public class AnswerTrigger : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[AnswerTrigger] Calling PlayerAnswered({thisAnswerIsAnomaly})");
+        Debug.Log($"[AnswerTrigger] '{gameObject.name}' calling PlayerAnswered({thisAnswerIsAnomaly})");
         GameManager.Instance.PlayerAnswered(thisAnswerIsAnomaly);
         myRoomGate.Disarm();
     }

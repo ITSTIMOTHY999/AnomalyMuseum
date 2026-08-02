@@ -28,6 +28,10 @@ public class RoomManager : MonoBehaviour
 
         setA.ApplyState(GameManager.Instance.GetLevelState(0));
         setB.ApplyState(GameManager.Instance.GetLevelState(1));
+
+        // Player starts inside A without ever crossing an entrance trigger to get there,
+        // so its gate needs to be armed manually at game start.
+        roomA.GetComponent<RoomGate>().Arm();
     }
 
     public void OnLevelChanged(bool wentForward)

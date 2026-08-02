@@ -77,6 +77,9 @@ public class GameManager : MonoBehaviour
         };
     }
 
+    // Only scores the answer and updates currentLevel.
+    // Map repositioning now happens in EntranceTrigger, once the player actually
+    // walks into the next room, not the instant they answer.
     public void PlayerAnswered(bool saidAnomaly)
     {
         bool correct = (saidAnomaly == levelHasAnomaly[currentLevel]);
@@ -96,8 +99,6 @@ public class GameManager : MonoBehaviour
                 currentLevel--;
         }
 
-        bool wentForward = !saidAnomaly; // entering "no anomaly" trigger = walked forward into B
-        RoomManager.Instance.OnLevelChanged(wentForward);
         UIManager.Instance.UpdateUI();
     }
 }
