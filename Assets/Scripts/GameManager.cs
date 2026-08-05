@@ -7,19 +7,23 @@ public class GameManager : MonoBehaviour
 
     [Header("Level State")]
     public int currentLevel = 0;
-    public bool[] levelHasAnomaly = new bool[9]; // index 1-8
-
-    [Header("Anomaly-capable Props")]
-    [Tooltip("Drag every AnomalyObject root (e.g. Tutankhamun_Root) in here.")]
-    public List<AnomalyObject> anomalyObjects = new List<AnomalyObject>();
+    public bool[] levelHasAnomaly = new bool[9]; // index 0-8
 
     private int[] levelAnomalyObjectIndex = new int[9];
+
+    [Tooltip("How many possible anomaly-capable props exist PER ROOM. Used to pick which prop index is the anomaly for a given level.")]
+    public int anomalyObjectPoolSize = 3; // set this to match how many AnomalyObjects each room prefab has
+
+    public struct LevelState
+    {
+        public bool hasAnomaly;
+        public int anomalyObjectIndex; // which prop (by index) in the room's own list should be the anomaly
+    }
 
     void Awake()
     {
         Instance = this;
         GenerateLevels();
-        ApplyLevelState();
     }
 
     void GenerateLevels()
@@ -49,33 +53,33 @@ public class GameManager : MonoBehaviour
             int level = levels[i];
             levelHasAnomaly[level] = true;
 
-            if (anomalyObjects.Count > 0)
+            if (anomalyObjectPoolSize > 0)
             {
-                levelAnomalyObjectIndex[level] = Random.Range(0, anomalyObjects.Count);
+                levelAnomalyObjectIndex[level] = Random.Range(0, anomalyObjectPoolSize);
             }
         }
 
         Debug.Log($"Anomaly count: {anomalyCount}");
         for (int i = 1; i <= 8; i++)
         {
-            string objName = levelAnomalyObjectIndex[i] >= 0
-                ? anomalyObjects[levelAnomalyObjectIndex[i]].name
-                : "none";
-            Debug.Log($"Level {i}: {(levelHasAnomaly[i] ? "ANOMALY" : "normal")} (object: {objName})");
+            Debug.Log($"Level {i}: {(levelHasAnomaly[i] ? "ANOMALY" : "normal")} (prop index: {levelAnomalyObjectIndex[i]})");
         }
     }
 
-    void ApplyLevelState()
+    // Rooms call this to find out how they should look for a given level index
+    public LevelState GetLevelState(int level)
     {
-        int chosenIndex = levelAnomalyObjectIndex[currentLevel];
-
-        for (int i = 0; i < anomalyObjects.Count; i++)
+        level = Mathf.Clamp(level, 0, 8);
+        return new LevelState
         {
-            bool shouldBeAnomaly = levelHasAnomaly[currentLevel] && (i == chosenIndex);
-            anomalyObjects[i].SetAnomaly(shouldBeAnomaly);
-        }
+            hasAnomaly = levelHasAnomaly[level],
+            anomalyObjectIndex = levelAnomalyObjectIndex[level]
+        };
     }
 
+    // Only scores the answer and updates currentLevel.
+    // Map repositioning now happens in EntranceTrigger, once the player actually
+    // walks into the next room, not the instant they answer.
     public void PlayerAnswered(bool saidAnomaly)
     {
         bool correct = (saidAnomaly == levelHasAnomaly[currentLevel]);
@@ -95,7 +99,6 @@ public class GameManager : MonoBehaviour
                 currentLevel--;
         }
 
-        ApplyLevelState();
         UIManager.Instance.UpdateUI();
     }
 }
